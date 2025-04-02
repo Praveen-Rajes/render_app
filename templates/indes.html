@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YOLO Live Stream</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>YOLO Model Live Stream</h1>
+    <img id="stream" src="" alt="Live Stream">
+    <h2>Detections</h2>
+    <ul id="detections"></ul>
+
+    <script>
+        // Update stream
+        function updateStream() {
+            fetch('/stream')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('stream').src = data;
+                });
+        }
+
+        // Update detections
+        function updateDetections() {
+            fetch('/detections')
+                .then(response => response.json())
+                .then(data => {
+                    const ul = document.getElementById('detections');
+                    ul.innerHTML = '';
+                    data.forEach(d => {
+                        const li = document.createElement('li');
+                        li.textContent = `${d.label} (${(d.confidence * 100).toFixed(2)}%) at [${d.box}]`;
+                        ul.appendChild(li);
+                    });
+                });
+        }
+
+        // Refresh every 100ms
+        setInterval(updateStream, 100);
+        setInterval(updateDetections, 100);
+    </script>
+</body>
+</html>
